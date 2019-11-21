@@ -29,6 +29,8 @@ for index in range(jointsNum):
     print("jointInfo = ", jointInfo)
 
 print(jointInfos[ankle1][9])
+
+startStateId = p.saveState()
 for i in range(10000):
     keyboardEvents = p.getKeyboardEvents()
     print("keyboardEvents = ", keyboardEvents)
@@ -47,52 +49,6 @@ for i in range(10000):
                                             controlMode=p.POSITION_CONTROL,
                                             targetPositions=[jointInfos[ankle1][9], jointInfos[ankle2][8], jointInfos[ankle3][8], jointInfos[ankle4][9]],
                                             forces=[maxForce, maxForce, maxForce, maxForce])
-
-                #
-            if 107 in keyboardEvents:
-                j_event = keyboardEvents[107]
-                if j_event == 1:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=ankle1,
-                                            controlMode=p.POSITION_CONTROL,
-                                            targetPosition=-0.6,
-                                            force=maxForce)
-                if j_event == 4:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=ankle1,
-                                            controlMode=p.POSITION_CONTROL,
-                                            targetPosition=0,
-                                            force=maxForce)
-            if 117 in keyboardEvents:
-                j_event = keyboardEvents[117]
-                if j_event == 1:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=hip1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=-100,
-                                            force=maxForce)
-                if j_event == 4:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=hip1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=0,
-                                            force=maxForce)
-
-                    #
-            if 105 in keyboardEvents:
-                j_event = keyboardEvents[105]
-                if j_event == 1:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=hip1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=100,
-                                            force=maxForce)
-                if j_event == 4:
-                    p.setJointMotorControl2(bodyUniqueId=boxId,
-                                            jointIndex=hip1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=0,
-                                            force = maxForce)
 
                 #
         if 107 in keyboardEvents:
@@ -138,7 +94,12 @@ for i in range(10000):
                                         jointIndex=hip1,
                                         controlMode=p.VELOCITY_CONTROL,
                                         targetVelocity=0,
-                                        force=maxForce)
+                                        force = maxForce)
+        if 114 in keyboardEvents:
+            j_event = keyboardEvents[114]
+            if j_event == 1:
+                p.restoreState(stateId=startStateId)
+
     print("jointState ankle1 = ", p.getJointState(boxId, ankle1))
     print("jointState hip1 = ", p.getJointState(boxId, hip1))
 
