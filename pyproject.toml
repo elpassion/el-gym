@@ -5,9 +5,10 @@ description = ""
 authors = ["Marek Langiewicz <marek.langiewicz@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 gym = "^0.15.4"
 pybullet = "^2.5"
+websockets = "^8.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
