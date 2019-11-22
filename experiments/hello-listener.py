@@ -14,8 +14,8 @@ def main():
     cubeStartPos = [0, 0, 1]
     cubeStartOrientation = p.getQuaternionFromEuler([0, 0, 0])
     boxId = p.loadURDF("r2d2.urdf", cubeStartPos, cubeStartOrientation)
-    boxId2 = p.loadMJCF("el-ant.xml", 0, 0)
-    boxId3 = p.loadMJCF("el-ant.xml", 0, 0)
+    # boxId2 = p.loadMJCF("ant2.xml", 0, 0)
+    # boxId3 = p.loadMJCF("ant2.xml", 0, 0)
     # boxId5 = p.loadMJCF("mjcf/swimmer.xml", 0, 0)
 
     with EventProvider() as provider:
@@ -26,8 +26,6 @@ def main():
                 print(f'Received command: {command}')
             p.stepSimulation()
             time.sleep(1. / 240.)
-    cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId2)
-    print(cubePos, cubeOrn)
     p.disconnect()
 
 if __name__ == '__main__':
