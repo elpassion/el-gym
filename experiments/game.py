@@ -39,10 +39,11 @@ def move_position(playerId, jointIndices, targetPositions):
                                 forces=[MAX_FORCE]*len(jointIndices))
 
 def doCommand(playerid, command):
-    if command == "jump":
+    print(f'Executing command {command} for player {playerid}')
+    if command in ["jump", "p:center"]:
         move_position(playerid, list(anklesMinPositions), list(anklesMinPositions.values()))
-    if command == "rest":
-        move_position(playerid, list(anklesMaxPositions), list(anklesMaxPositions.values()))
+    if command == ["rest", "r:center"]:
+        move_position(playerid, list(anklesMinPositions), list(anklesMaxPositions.values()))
     if command == "first_ankles_go":
         move_position(playerid, [ANKLE1, ANKLE3], [anklesMinPositions[ANKLE1], anklesMinPositions[ANKLE3]])
     if command == "first_ankles_stop":
@@ -69,25 +70,25 @@ def doCommand(playerid, command):
                                 controlMode=p.POSITION_CONTROL,
                                 targetPosition=jointInfos[ANKLE1][8],
                                 force=MAX_FORCE)
-    if command == "onelegup":
+    if command in ["onelegup", "p:up"]:
         p.setJointMotorControl2(bodyUniqueId=playerid,
                                 jointIndex=ANKLE1,
                                 controlMode=p.POSITION_CONTROL,
                                 targetPosition=jointInfos[ANKLE1][9],
                                 force=MAX_FORCE)
-    if command == "onelegleft":
+    if command in ["onelegleft", "p:left"]:
         p.setJointMotorControl2(bodyUniqueId=playerid,
                                 jointIndex=HIP1,
                                 controlMode=p.VELOCITY_CONTROL,
                                 targetVelocity=-100,
                                 force=MAX_FORCE)
-    if command == "onelegright":
+    if command in ["onelegright", "p:right"]:
         p.setJointMotorControl2(bodyUniqueId=playerid,
                                 jointIndex=HIP1,
                                 controlMode=p.VELOCITY_CONTROL,
                                 targetVelocity=100,
                                 force=MAX_FORCE)
-    if command == "onelegrest":
+    if command in ["onelegrest", "r:left", "r:top", "r:right"]:
         p.setJointMotorControl2(bodyUniqueId=playerid,
                                 jointIndex=HIP1,
                                 controlMode=p.VELOCITY_CONTROL,
@@ -105,6 +106,7 @@ def updateEnv(players):
         elif not player.isBorn:
             player.id = p.loadMJCF("ant2.xml", 0, 0)[0]
             player.isBorn = True
+            p.stepSimulation()
         else:
             for command in player.todo: doCommand(player.id, command)
             player.todo.clear()
@@ -165,7 +167,10 @@ def main():
             if event:
                 command = event['value']
                 print(f'Received command: {command}')
-                players[event["name"]].todo.append(event["value"])
+                if event["name"] not in players:
+                    players[event["name"]] = Player()
+                else:
+                    players[event["name"]].todo.append(event["value"])
 
             global keyboardEvents
             keyboardEvents = p.getKeyboardEvents()
@@ -215,3 +220,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    p.disconnect()
