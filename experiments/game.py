@@ -105,9 +105,8 @@ def updateEnv(players):
             player.id = p.loadMJCF("ant2.xml", 0, 0)[0]
             player.isBorn = True
         else:
-            for command in player.todo:
-                doCommand(player.id, command)
-        player.todo.clear()
+            for command in player.todo: doCommand(player.id, command)
+            player.todo.clear()
 
 
 def pressed(key):
@@ -197,6 +196,9 @@ def main():
             break
 
         if pressed('n'):
+            if "Master" in players:
+                players["Master"].isDead = True
+                updateEnv(players)
             players["Master"] = Player()
 
         p.stepSimulation()
