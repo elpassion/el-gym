@@ -40,9 +40,13 @@ def move_position(playerId, jointIndices, targetPositions):
 
 
 def move(players):
-    print(players) #FIXME: remove
+    print(players)  # FIXME: remove
     global jointInfos
     for player in players.values():
+        if player.isDead:
+            if player.id is not None:
+                p.removeBody(player.id)
+                player.id = None
         for command in player.todo:
             if command == "jump":
                 move_position(player.id, list(anklesMinPositions), list(anklesMinPositions.values()))
@@ -76,10 +80,10 @@ def move(players):
                                         force=MAX_FORCE)
             if command == "onelegup":
                 p.setJointMotorControl2(bodyUniqueId=player.id,
-                                    jointIndex=ANKLE1,
-                                    controlMode=p.POSITION_CONTROL,
-                                    targetPosition=jointInfos[ANKLE1][9],
-                                    force=MAX_FORCE)
+                                        jointIndex=ANKLE1,
+                                        controlMode=p.POSITION_CONTROL,
+                                        targetPosition=jointInfos[ANKLE1][9],
+                                        force=MAX_FORCE)
 
             if command == "onelegleft":
                 p.setJointMotorControl2(bodyUniqueId=player.id,
@@ -171,12 +175,15 @@ def main():
         if released('j'): players["Master"].todo.append("rest")
         if pressed('k'): players["Master"].todo.append("onelegdown")
         if released('k'): players["Master"].todo.append("onelegup")
-        if pressed('u'): players["Master"].todo.append("onelegleft") #FIXME: or right??
+        if pressed('u'): players["Master"].todo.append("onelegleft")  # FIXME: or right??
         if released('u'): players["Master"].todo.append("onelegrest")
-        if pressed('i'): players["Master"].todo.append("onelegright") #FIXME: or left??
+        if pressed('i'): players["Master"].todo.append("onelegright")  # FIXME: or left??
         if released('i'): players["Master"].todo.append("onelegrest")
+        if pressed('d'): players["Master"].isDead = True
 
         if pressed('r'):
+            for player in players.values(): player.isDead = True
+            move(players)
             p.restoreState(stateId=startStateId)
 
         if pressed('\\'):
