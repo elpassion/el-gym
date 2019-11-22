@@ -22,7 +22,19 @@ hip4 = 16
 ankle4 = 18
 maxForce = 1000
 
+keyboardEvents = {}
+
+
+def pressed(key):
+    return ord(key) in keyboardEvents and keyboardEvents[ord(key)] == 1
+
+
+def released(key):
+    return ord(key) in keyboardEvents and keyboardEvents[ord(key)] == 4
+
+
 jointInfos = []
+
 for index in range(jointsNum):
     jointInfo = p.getJointInfo(boxId, index)
     jointInfos.append(jointInfo)
@@ -31,27 +43,24 @@ for index in range(jointsNum):
 print(jointInfos[ankle1][9])
 
 startStateId = p.saveState()
+
 for i in range(1000000):
 
     keyboardEvents = p.getKeyboardEvents()
-
-    def pressed(key):
-        return ord(key) in keyboardEvents and keyboardEvents[ord(key)] == 1
-
-    def released(key):
-        return ord(key) in keyboardEvents and keyboardEvents[ord(key)] == 4
 
     if released('j'):
         p.setJointMotorControlArray(bodyUniqueId=boxId,
                                     jointIndices=[ankle1, ankle2, ankle3, ankle4],
                                     controlMode=p.POSITION_CONTROL,
-                                    targetPositions=[jointInfos[ankle1][8], jointInfos[ankle2][9], jointInfos[ankle3][9], jointInfos[ankle4][8]],
-                                    forces=[maxForce, maxForce,maxForce, maxForce])
+                                    targetPositions=[jointInfos[ankle1][8], jointInfos[ankle2][9],
+                                                     jointInfos[ankle3][9], jointInfos[ankle4][8]],
+                                    forces=[maxForce, maxForce, maxForce, maxForce])
     if pressed('j'):
         p.setJointMotorControlArray(bodyUniqueId=boxId,
                                     jointIndices=[ankle1, ankle2, ankle3, ankle4],
                                     controlMode=p.POSITION_CONTROL,
-                                    targetPositions=[jointInfos[ankle1][9], jointInfos[ankle2][8], jointInfos[ankle3][8], jointInfos[ankle4][9]],
+                                    targetPositions=[jointInfos[ankle1][9], jointInfos[ankle2][8],
+                                                     jointInfos[ankle3][8], jointInfos[ankle4][9]],
                                     forces=[maxForce, maxForce, maxForce, maxForce])
 
     if pressed('k'):
@@ -68,11 +77,11 @@ for i in range(1000000):
                                 force=maxForce)
 
     if pressed('u'):
-            p.setJointMotorControl2(bodyUniqueId=boxId,
-                                    jointIndex=hip1,
-                                    controlMode=p.VELOCITY_CONTROL,
-                                    targetVelocity=-100,
-                                    force=maxForce)
+        p.setJointMotorControl2(bodyUniqueId=boxId,
+                                jointIndex=hip1,
+                                controlMode=p.VELOCITY_CONTROL,
+                                targetVelocity=-100,
+                                force=maxForce)
     if released('k'):
         p.setJointMotorControl2(bodyUniqueId=boxId,
                                 jointIndex=hip1,
@@ -91,7 +100,7 @@ for i in range(1000000):
                                 jointIndex=hip1,
                                 controlMode=p.VELOCITY_CONTROL,
                                 targetVelocity=0,
-                                force = maxForce)
+                                force=maxForce)
 
     if pressed('r'):
         p.restoreState(stateId=startStateId)
@@ -110,5 +119,3 @@ for i in range(1000000):
 
     p.stepSimulation()
     time.sleep(1. / 240.)
-
-
