@@ -6,13 +6,14 @@ from contextlib import ContextDecorator
 import websockets
 
 class EventProvider(ContextDecorator):
-    def __init__(self):
+    def __init__(self, game_id=None):
         self.events = []
         self.socket = None
         self.stopped = False
+        self.game_id = game_id
 
     async def fetch_events(self):
-        uri = 'wss://api.asapdeploy.com/ws/commands/1/'
+        uri = f'wss://api.asapdeploy.com/ws/commands/{self.game_id}/'
         async with websockets.connect(uri) as socket:
             print('Connected!')
             while not self.stopped:
