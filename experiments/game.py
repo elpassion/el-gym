@@ -36,6 +36,62 @@ def move_position(playerId, jointIndices, targetPositions):
                                 targetPositions=targetPositions,
                                 forces=[MAX_FORCE]*len(jointIndices))
 
+def doCommand(playerid, command):
+    if command == "jump":
+        move_position(playerid, list(anklesMinPositions), list(anklesMinPositions.values()))
+    if command == "rest":
+        move_position(playerid, list(anklesMaxPositions), list(anklesMaxPositions.values()))
+    if command == "first_ankles_go":
+        move_position(playerid, [ANKLE1, ANKLE3], [anklesMinPositions[ANKLE1], anklesMinPositions[ANKLE3]])
+    if command == "first_ankles_stop":
+        move_position(playerid, [ANKLE1, ANKLE3], [anklesMaxPositions[ANKLE1], anklesMaxPositions[ANKLE3]])
+    if command == "second_ankles_go":
+        move_position(playerid, [ANKLE2, ANKLE4], [anklesMinPositions[ANKLE2], anklesMinPositions[ANKLE4]])
+    if command == "second_ankles_stop":
+        move_position(playerid, [ANKLE2, ANKLE4], [anklesMaxPositions[ANKLE2], anklesMaxPositions[ANKLE4]])
+    if command == "first_hips_go":
+        move_position(playerid, [HIP1, HIP3], [hipMinPositions[HIP1], hipMinPositions[HIP3]])
+    if command == "first_hips_stop":
+        move_position(playerid, [HIP1, HIP3], [hipMaxPositions[HIP1], hipMaxPositions[HIP3]])
+    if command == "first_hips_0":
+        move_position(playerid, [HIP1, HIP3], [0, 0])
+    if command == "second_hips_go":
+        move_position(playerid, [HIP2, HIP4], [hipMinPositions[HIP2], hipMinPositions[HIP4]])
+    if command == "second_hips_stop":
+        move_position(playerid, [HIP2, HIP4], [hipMaxPositions[HIP2], hipMaxPositions[HIP4]])
+    if command == "second_hips_0":
+        move_position(playerid, [HIP2, HIP4], [0, 0])
+    if command == "onelegdown":
+        p.setJointMotorControl2(bodyUniqueId=playerid,
+                                jointIndex=ANKLE1,
+                                controlMode=p.POSITION_CONTROL,
+                                targetPosition=jointInfos[ANKLE1][8],
+                                force=MAX_FORCE)
+    if command == "onelegup":
+        p.setJointMotorControl2(bodyUniqueId=playerid,
+                                jointIndex=ANKLE1,
+                                controlMode=p.POSITION_CONTROL,
+                                targetPosition=jointInfos[ANKLE1][9],
+                                force=MAX_FORCE)
+    if command == "onelegleft":
+        p.setJointMotorControl2(bodyUniqueId=playerid,
+                                jointIndex=HIP1,
+                                controlMode=p.VELOCITY_CONTROL,
+                                targetVelocity=-100,
+                                force=MAX_FORCE)
+    if command == "onelegright":
+        p.setJointMotorControl2(bodyUniqueId=playerid,
+                                jointIndex=HIP1,
+                                controlMode=p.VELOCITY_CONTROL,
+                                targetVelocity=100,
+                                force=MAX_FORCE)
+    if command == "onelegrest":
+        p.setJointMotorControl2(bodyUniqueId=playerid,
+                                jointIndex=HIP1,
+                                controlMode=p.VELOCITY_CONTROL,
+                                targetVelocity=0,
+                                force=MAX_FORCE)
+
 
 def updateEnv(players):
     print(players)  # FIXME: remove
@@ -50,61 +106,7 @@ def updateEnv(players):
             player.isBorn = True
         else:
             for command in player.todo:
-                if command == "jump":
-                    move_position(player.id, list(anklesMinPositions), list(anklesMinPositions.values()))
-            if command == "rest":
-                move_position(player.id, list(anklesMaxPositions), list(anklesMaxPositions.values()))
-                                                if command == "first_ankles_go":
-                move_position(player.id,  [ANKLE1, ANKLE3], [anklesMinPositions[ANKLE1], anklesMinPositions[ANKLE3]])
-                                                if command == "first_ankles_stop":
-                                                move_position(player.id,  [ANKLE1, ANKLE3], [anklesMaxPositions[ANKLE1], anklesMaxPositions[ANKLE3]])
-            if command == "second_ankles_go":
-                move_position(player.id,  [ANKLE2, ANKLE4], [anklesMinPositions[ANKLE2], anklesMinPositions[ANKLE4]])
-                                                                 if command == "second_ankles_stop":
-                move_position(player.id,  [ANKLE2, ANKLE4], [anklesMaxPositions[ANKLE2], anklesMaxPositions[ANKLE4]])
-            if command == "first_hips_go":
-                                                move_position(player.id,  [HIP1, HIP3], [hipMinPositions[HIP1], hipMinPositions[HIP3]])
-                if command == "first_hips_stop":
-                move_position(player.id,  [HIP1, HIP3], [hipMaxPositions[HIP1], hipMaxPositions[HIP3]])
-            if command == "first_hips_0":
-                    move_position(player.id,  [HIP1, HIP3], [0, 0])
-            if command == "second_hips_go":
-                                                move_position(player.id,  [HIP2, HIP4], [hipMinPositions[HIP2], hipMinPositions[HIP4]])
-                                                if command == "second_hips_stop":
-                                                move_position(player.id,  [HIP2, HIP4], [hipMaxPositions[HIP2], hipMaxPositions[HIP4]])
-                                                                 if command == "second_hips_0":
-                                                move_position(player.id,  [HIP2, HIP4], [0, 0])
-                if command == "onelegdown":
-                    p.setJointMotorControl2(bodyUniqueId=player.id,
-                                            jointIndex=ANKLE1,
-                                            controlMode=p.POSITION_CONTROL,
-                                            targetPosition=jointInfos[ANKLE1][8],
-                                            force=MAX_FORCE)
-                if command == "onelegup":
-                    p.setJointMotorControl2(bodyUniqueId=player.id,
-                                            jointIndex=ANKLE1,
-                                            controlMode=p.POSITION_CONTROL,
-                                            targetPosition=jointInfos[ANKLE1][9],
-                                            force=MAX_FORCE)
-
-                if command == "onelegleft":
-                    p.setJointMotorControl2(bodyUniqueId=player.id,
-                                            jointIndex=HIP1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=-100,
-                                            force=MAX_FORCE)
-                if command == "onelegright":
-                    p.setJointMotorControl2(bodyUniqueId=player.id,
-                                            jointIndex=HIP1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=100,
-                                            force=MAX_FORCE)
-                if command == "onelegrest":
-                    p.setJointMotorControl2(bodyUniqueId=player.id,
-                                            jointIndex=HIP1,
-                                            controlMode=p.VELOCITY_CONTROL,
-                                            targetVelocity=0,
-                                            force=MAX_FORCE)
+                doCommand(player.id, command)
         player.todo.clear()
 
 
@@ -127,6 +129,15 @@ def main():
     p.setGravity(0, 0, -10)
     p.loadURDF("plane.urdf")
 
+    startStateId = p.saveState()
+
+    players = {"Master": Player()}
+    updateEnv(players)
+
+    for index in range(p.getNumJoints(players["Master"].id)):
+        jointInfo = p.getJointInfo(players["Master"].id, index)
+        jointInfos.append(jointInfo)
+
     anklesMinPositions[ANKLE1] = jointInfos[ANKLE1][9]
     anklesMinPositions[ANKLE2] = jointInfos[ANKLE2][8]
     anklesMinPositions[ANKLE3] = jointInfos[ANKLE3][8]
@@ -144,14 +155,6 @@ def main():
     hipMaxPositions[HIP3] = jointInfos[HIP3][9]
     hipMaxPositions[HIP4] = jointInfos[HIP4][8]
 
-    startStateId = p.saveState()
-
-    players = {"Master": Player()}
-    updateEnv(players)
-
-    for index in range(p.getNumJoints(players["Master"].id)):
-        jointInfo = p.getJointInfo(players["Master"].id, index)
-        jointInfos.append(jointInfo)
 
     while True:
 
