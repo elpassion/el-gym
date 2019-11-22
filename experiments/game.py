@@ -135,7 +135,7 @@ def main():
     p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, -10)
-    p.loadURDF("plane.urdf")
+    p.loadURDF("sphere2.urdf", globalScaling=29, useFixedBase=1, basePosition=[0, 0, -14.1])
 
     startStateId = p.saveState()
 

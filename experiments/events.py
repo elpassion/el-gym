@@ -6,7 +6,7 @@ from contextlib import ContextDecorator
 import websockets
 
 class EventProvider(ContextDecorator):
-    def __init__(self, game_id=None):
+    def __init__(self, game_id='1'):
         self.events = []
         self.socket = None
         self.stopped = False
