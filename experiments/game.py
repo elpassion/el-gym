@@ -7,10 +7,17 @@ from experiments.events import EventProvider
 
 
 class Player:
-    id: int = None
-    todo: list = []
-    isBorn: bool = False
-    isDead: bool = False
+    id: int
+    todo: list
+    isBorn: bool
+    isDead: bool
+
+    def __init__(self):
+        self.id = None
+        self.todo = []
+        self.isBorn = False
+        self.isDead = False
+
 
 
 HIP1 = 1
@@ -39,7 +46,6 @@ def move_position(playerId, jointIndices, targetPositions):
                                 forces=[MAX_FORCE]*len(jointIndices))
 
 def doCommand(playerid, command):
-    print(f'Executing command {command} for player {playerid}')
     if command in ["jump", "p:center"]:
         move_position(playerid, list(anklesMinPositions), list(anklesMinPositions.values()))
     if command == ["rest", "r:center"]:
@@ -98,7 +104,7 @@ def doCommand(playerid, command):
 
 def updateEnv(players):
     global jointInfos
-    for player in players.values():
+    for (name, player) in players.items():
         if player.isDead:
             if player.id is not None:
                 p.removeBody(player.id)
