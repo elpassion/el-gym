@@ -3,6 +3,8 @@ import time
 import pybullet as p
 import pybullet_data
 
+from experiments.events import EventProvider
+
 
 class Player:
     id: int = None
@@ -94,7 +96,6 @@ def doCommand(playerid, command):
 
 
 def updateEnv(players):
-    print(players)  # FIXME: remove
     global jointInfos
     for player in players.values():
         if player.isDead:
@@ -155,54 +156,61 @@ def main():
     hipMaxPositions[HIP4] = jointInfos[HIP4][8]
 
 
-    while True:
+    with EventProvider() as provider:
+        while True:
 
-        updateEnv(players)
-
-        global keyboardEvents
-        keyboardEvents = p.getKeyboardEvents()
-
-        if pressed('1'): players["Master"].todo.append("first_ankles_go")
-        if released('1'): players["Master"].todo.append("first_ankles_stop")
-        if pressed('2'): players["Master"].todo.append("first_hips_go")
-        if released('2'): players["Master"].todo.append("first_hips_0")
-        if pressed('3'): players["Master"].todo.append("first_hips_stop")
-        if released('3'): players["Master"].todo.append("first_hips_0")
-        if pressed('4'): players["Master"].todo.append("second_ankles_go")
-        if released('4'): players["Master"].todo.append("second_ankles_stop")
-        if pressed('5'): players["Master"].todo.append("second_hips_go")
-        if released('5'): players["Master"].todo.append("second_hips_0")
-        if pressed('6'): players["Master"].todo.append("second_hips_stop")
-        if released('6'): players["Master"].todo.append("second_hips_0")
-        if pressed('j'): players["Master"].todo.append("jump")
-        if released('j'): players["Master"].todo.append("rest")
-        if pressed('k'): players["Master"].todo.append("onelegdown")
-        if released('k'): players["Master"].todo.append("onelegup")
-        if pressed('u'): players["Master"].todo.append("onelegleft")  # FIXME: or right??
-        if released('u'): players["Master"].todo.append("onelegrest")
-        if pressed('i'): players["Master"].todo.append("onelegright")  # FIXME: or left??
-        if released('i'): players["Master"].todo.append("onelegrest")
-        if pressed('d'): players["Master"].isDead = True
-
-        if pressed('r'):
-            for player in players.values(): player.isDead = True
             updateEnv(players)
-            p.restoreState(stateId=startStateId)
 
-        if pressed('\\'):
-            p.setGravity(7, 1, -8)
+            event = provider.pop_event()
+            if event:
+                command = event['value']
+                print(f'Received command: {command}')
+                players[event["name"]].todo.append(event["value"])
 
-        if pressed('q'):
-            break
+            global keyboardEvents
+            keyboardEvents = p.getKeyboardEvents()
 
-        if pressed('n'):
-            if "Master" in players:
-                players["Master"].isDead = True
+            if pressed('1'): players["Master"].todo.append("first_ankles_go")
+            if released('1'): players["Master"].todo.append("first_ankles_stop")
+            if pressed('2'): players["Master"].todo.append("first_hips_go")
+            if released('2'): players["Master"].todo.append("first_hips_0")
+            if pressed('3'): players["Master"].todo.append("first_hips_stop")
+            if released('3'): players["Master"].todo.append("first_hips_0")
+            if pressed('4'): players["Master"].todo.append("second_ankles_go")
+            if released('4'): players["Master"].todo.append("second_ankles_stop")
+            if pressed('5'): players["Master"].todo.append("second_hips_go")
+            if released('5'): players["Master"].todo.append("second_hips_0")
+            if pressed('6'): players["Master"].todo.append("second_hips_stop")
+            if released('6'): players["Master"].todo.append("second_hips_0")
+            if pressed('j'): players["Master"].todo.append("jump")
+            if released('j'): players["Master"].todo.append("rest")
+            if pressed('k'): players["Master"].todo.append("onelegdown")
+            if released('k'): players["Master"].todo.append("onelegup")
+            if pressed('u'): players["Master"].todo.append("onelegleft")  # FIXME: or right??
+            if released('u'): players["Master"].todo.append("onelegrest")
+            if pressed('i'): players["Master"].todo.append("onelegright")  # FIXME: or left??
+            if released('i'): players["Master"].todo.append("onelegrest")
+            if pressed('d'): players["Master"].isDead = True
+
+            if pressed('r'):
+                for player in players.values(): player.isDead = True
                 updateEnv(players)
-            players["Master"] = Player()
+                p.restoreState(stateId=startStateId)
 
-        p.stepSimulation()
-        time.sleep(1. / 240.)
+            if pressed('\\'):
+                p.setGravity(7, 1, -8)
+
+            if pressed('q'):
+                break
+
+            if pressed('n'):
+                if "Master" in players:
+                    players["Master"].isDead = True
+                    updateEnv(players)
+                players["Master"] = Player()
+
+            p.stepSimulation()
+            time.sleep(1. / 240.)
 
 
 if __name__ == '__main__':

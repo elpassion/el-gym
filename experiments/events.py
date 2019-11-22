@@ -12,7 +12,7 @@ class EventProvider(ContextDecorator):
         self.stopped = False
 
     async def fetch_events(self):
-        uri = 'wss://api.asapdeploy.com/ws/commands/'
+        uri = 'wss://api.asapdeploy.com/ws/commands/1/'
         async with websockets.connect(uri) as socket:
             print('Connected!')
             while not self.stopped:
