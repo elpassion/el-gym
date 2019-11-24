@@ -45,11 +45,16 @@ def move_position(playerId, jointIndices, targetPositions):
                                 targetPositions=targetPositions,
                                 forces=[MAX_FORCE]*len(jointIndices))
 
+
+def move_velocity(playerId, jointIndices, targetVelocity):
+    p.setJointMotorControlArray(playerId,
+                            jointIndices=jointIndices,
+                            controlMode=p.VELOCITY_CONTROL,
+                            targetVelocities=[targetVelocity] * len(jointIndices),
+                            forces=[MAX_FORCE]*len(jointIndices))
+
+
 def doCommand(playerid, command):
-    if command in ["jump", "p:center"]:
-        move_position(playerid, list(anklesMinPositions), list(anklesMinPositions.values()))
-    if command == ["rest", "r:center"]:
-        move_position(playerid, list(anklesMinPositions), list(anklesMaxPositions.values()))
     if command == "first_ankles_go":
         move_position(playerid, [ANKLE1, ANKLE3], [anklesMinPositions[ANKLE1], anklesMinPositions[ANKLE3]])
     if command == "first_ankles_stop":
@@ -70,36 +75,17 @@ def doCommand(playerid, command):
         move_position(playerid, [HIP2, HIP4], [hipMaxPositions[HIP2], hipMaxPositions[HIP4]])
     if command == "second_hips_0":
         move_position(playerid, [HIP2, HIP4], [0, 0])
-    if command == "onelegdown":
-        p.setJointMotorControl2(bodyUniqueId=playerid,
-                                jointIndex=ANKLE1,
-                                controlMode=p.POSITION_CONTROL,
-                                targetPosition=jointInfos[ANKLE1][8],
-                                force=MAX_FORCE)
-    if command in ["onelegup", "p:up"]:
-        p.setJointMotorControl2(bodyUniqueId=playerid,
-                                jointIndex=ANKLE1,
-                                controlMode=p.POSITION_CONTROL,
-                                targetPosition=jointInfos[ANKLE1][9],
-                                force=MAX_FORCE)
-    if command in ["onelegleft", "p:left"]:
-        p.setJointMotorControl2(bodyUniqueId=playerid,
-                                jointIndex=HIP1,
-                                controlMode=p.VELOCITY_CONTROL,
-                                targetVelocity=-100,
-                                force=MAX_FORCE)
-    if command in ["onelegright", "p:right"]:
-        p.setJointMotorControl2(bodyUniqueId=playerid,
-                                jointIndex=HIP1,
-                                controlMode=p.VELOCITY_CONTROL,
-                                targetVelocity=100,
-                                force=MAX_FORCE)
-    if command in ["onelegrest", "r:left", "r:top", "r:right"]:
-        p.setJointMotorControl2(bodyUniqueId=playerid,
-                                jointIndex=HIP1,
-                                controlMode=p.VELOCITY_CONTROL,
-                                targetVelocity=0,
-                                force=MAX_FORCE)
+
+    if command in ["p:top:left", "p:top", "p:left", "p:center"]: move_velocity(playerid, [ANKLE2], -100)
+    if command in ["r:top:left", "r:top", "r:left", "r:center"]: move_velocity(playerid, [ANKLE2], 100)
+
+    if command in ["p:top:right", "p:top", "p:right", "p:center"]: move_velocity(playerid, [ANKLE1], 100)
+    if command in ["r:top:right", "r:top", "r:right", "r:center"]: move_velocity(playerid, [ANKLE1], -100)
+
+    if command in ["p:bottom:left", "p:bottom", "p:left", "p:center"]: move_velocity(playerid, [ANKLE3], -100)
+    if command in ["r:bottom:left", "r:bottom", "r:left", "r:center"]: move_velocity(playerid, [ANKLE3], 100)
+    if command in ["p:bottom:right", "p:bottom", "p:right", "p:center"]: move_velocity(playerid, [ANKLE4], 100)
+    if command in ["r:bottom:right", "r:bottom", "r:right", "r:center"]: move_velocity(playerid, [ANKLE4], -100)
 
 
 def updateEnv(players):
@@ -112,7 +98,6 @@ def updateEnv(players):
         elif not player.isBorn:
             player.id = p.loadMJCF("ant2.xml", 0, 0)[0]
             player.isBorn = True
-            p.stepSimulation()
         else:
             for command in player.todo: doCommand(player.id, command)
             player.todo.clear()
@@ -134,7 +119,7 @@ def main():
     global anklesMaxPositions
     p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
-    p.setGravity(0, 0, -10)
+    p.setGravity(0, 0, -6)
     p.loadURDF("sphere2.urdf", globalScaling=29, useFixedBase=1, basePosition=[0, 0, -14.1])
 
     startStateId = p.saveState()
@@ -165,6 +150,7 @@ def main():
 
 
     with EventProvider() as provider:
+        p.setRealTimeSimulation(True)
         while True:
 
             updateEnv(players)
@@ -193,14 +179,16 @@ def main():
             if released('5'): players["Master"].todo.append("second_hips_0")
             if pressed('6'): players["Master"].todo.append("second_hips_stop")
             if released('6'): players["Master"].todo.append("second_hips_0")
-            if pressed('j'): players["Master"].todo.append("jump")
-            if released('j'): players["Master"].todo.append("rest")
-            if pressed('k'): players["Master"].todo.append("onelegdown")
-            if released('k'): players["Master"].todo.append("onelegup")
-            if pressed('u'): players["Master"].todo.append("onelegleft")  # FIXME: or right??
-            if released('u'): players["Master"].todo.append("onelegrest")
-            if pressed('i'): players["Master"].todo.append("onelegright")  # FIXME: or left??
-            if released('i'): players["Master"].todo.append("onelegrest")
+            if pressed('j'): players["Master"].todo.append("p:left")
+            if released('j'): players["Master"].todo.append("r:left")
+            if pressed('k'): players["Master"].todo.append("p:center")
+            if released('k'): players["Master"].todo.append("r:center")
+            if pressed('l'): players["Master"].todo.append("p:right")
+            if released('l'): players["Master"].todo.append("r:right")
+            if pressed('i'): players["Master"].todo.append("p:top")
+            if released('i'): players["Master"].todo.append("r:top")
+            if pressed('m'): players["Master"].todo.append("p:bottom")
+            if released('m'): players["Master"].todo.append("r:bottom")
             if pressed('d'): players["Master"].isDead = True
 
             if pressed('r'):
@@ -220,7 +208,6 @@ def main():
                     updateEnv(players)
                 players["Master"] = Player()
 
-            p.stepSimulation()
             time.sleep(1. / 240.)
 
 
